@@ -14,7 +14,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float jumpSpeed;
     [SerializeField]
+    private float counterJump;
+    [SerializeField]
     private bool isGrounded;
+    [SerializeField]
+    private bool isJumping;
+    
 
     private float direction;
     private Vector2 facingRight;
@@ -34,17 +39,23 @@ public class PlayerController : MonoBehaviour
     {
         Walking();
 
+        JumpTest();
+
         Fight();
     }
 
+  
+
     private void Update()
     {
-        DoubleJump();
+        VariableJump();
     }
 
     private void Jump()
     {
-        rb.velocity = Vector2.up * jumpSpeed;
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+        }
     }
 
 
@@ -70,6 +81,39 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    private void VariableJump()
+    {
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            isJumping = true;
+        }
+        if (Input.GetButton("Jump"))
+        {
+            counterJump -= Time.deltaTime;
+        }
+        if (Input.GetButtonUp("Jump"))
+        {
+            isJumping = false;
+            counterJump = 0.5f;
+        }
+    }
+
+    private void JumpTest()
+    {
+        if (isJumping)
+        {
+            if (counterJump > 0)
+            {
+                Jump();    
+            }
+            else
+            {
+                isJumping = false;
+            }
+        }
+    }
+
+
     private void Walking()
     {
         direction = (Input.GetAxisRaw("Horizontal"));
@@ -88,10 +132,12 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
     }
 
+
     private void Fight()
     {
 
     }
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
