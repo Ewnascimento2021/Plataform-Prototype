@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private bool isJumping;
 
+    private Animator animator;
 
     private float direction;
     private Vector2 facingRight;
@@ -33,11 +34,12 @@ public class PlayerController : MonoBehaviour
         facingRight = transform.localScale;
         facingLeft = transform.localScale;
         facingLeft.x = facingLeft.x * -1;
+        animator = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
     {
-        Walking();
+        Run();
 
         JumpTest();
 
@@ -86,6 +88,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             isJumping = true;
+            animator.SetBool("Jump", true);
         }
         if (Input.GetButton("Jump"))
         {
@@ -94,6 +97,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonUp("Jump"))
         {
             isJumping = false;
+           
             counterJump = 0.5f;
         }
     }
@@ -114,10 +118,17 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void Walking()
+    private void Run()
     {
         direction = (Input.GetAxisRaw("Horizontal"));
-
+        if (direction == 0)
+        {
+            animator.SetBool("Run", false);
+        }
+        else
+        {
+            animator.SetBool("Run", true);
+        }
 
         if (direction == 1)
         {
@@ -144,6 +155,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "Ground")
         {
             isGrounded = true;
+            animator.SetBool("Jump", false);
         }
     }
 
