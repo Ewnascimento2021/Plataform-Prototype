@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     [SerializeField]
     private bool isJumping;
-    
+
 
     private float direction;
     private Vector2 facingRight;
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         Fight();
     }
 
-  
+
 
     private void Update()
     {
@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
         {
             if (counterJump > 0)
             {
-                Jump();    
+                Jump();
             }
             else
             {
