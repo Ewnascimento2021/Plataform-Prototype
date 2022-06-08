@@ -16,13 +16,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float counterJump;
     [SerializeField]
+    private float reloadTimeAttack;
+    [SerializeField]
     private bool isGrounded;
     [SerializeField]
     private bool isJumping;
 
     private Animator animator;
 
+    private bool testAttack = false;
     private float direction;
+    private float elapsedTime;
     private Vector2 facingRight;
     private Vector2 facingLeft;
 
@@ -43,7 +47,8 @@ public class PlayerController : MonoBehaviour
 
         JumpTest();
 
-        Fight();
+
+
     }
 
 
@@ -51,6 +56,9 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         VariableJump();
+
+        Attack();
+
     }
 
     private void Jump()
@@ -97,7 +105,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonUp("Jump"))
         {
             isJumping = false;
-           
+
             counterJump = 0.5f;
         }
     }
@@ -120,35 +128,59 @@ public class PlayerController : MonoBehaviour
 
     private void Run()
     {
-        direction = (Input.GetAxisRaw("Horizontal"));
-        if (direction == 0)
+        if (testAttack == false)
         {
-            animator.SetBool("Run", false);
-        }
-        else
-        {
-            animator.SetBool("Run", true);
-        }
 
-        if (direction == 1)
-        {
-            transform.localScale = facingRight;
-        }
 
-        else if (direction == -1)
-        {
-            transform.localScale = facingLeft;
-        }
+            direction = (Input.GetAxisRaw("Horizontal"));
 
-        rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
+            if (direction == 0)
+            {
+                animator.SetBool("Run", false);
+            }
+            else
+            {
+                animator.SetBool("Run", true);
+            }
+
+            if (direction == 1)
+            {
+                transform.localScale = facingRight;
+            }
+
+            else if (direction == -1)
+            {
+                transform.localScale = facingLeft;
+            }
+
+            rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
+        }
     }
 
 
-    private void Fight()
+    private void Attack()
     {
+        if (Input.GetButtonDown("Fire1"))
+        {
+            animator.SetBool("Attack", true);
 
+            testAttack = true;
+        }
+
+        if (testAttack == true)
+        {
+            elapsedTime += Time.deltaTime;
+
+            if (elapsedTime >= reloadTimeAttack)
+            {
+                elapsedTime = 0f;
+
+                animator.SetBool("Attack", false);
+
+                testAttack = false;
+            }
+        }
     }
-
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
