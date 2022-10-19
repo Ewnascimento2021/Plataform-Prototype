@@ -10,6 +10,7 @@ TagManager:
   - Flecha
   - Armadilha
   - Bau
+  - Door
   layers:
   - Default
   - TransparentFX

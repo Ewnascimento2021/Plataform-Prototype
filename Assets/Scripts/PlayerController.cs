@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -251,6 +252,10 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Bau"))
         {
             Destroy(other.gameObject);
+        }
+        if (other.CompareTag("Door"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
 

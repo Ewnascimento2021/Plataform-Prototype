@@ -29,4 +29,10 @@ public class GameController : MonoBehaviour
             Instantiate(projectile, spawn.position, spawn.rotation);
         }
     }
+
+
+    //if (Input.GetKeyDown(KeyCode.R))
+    //        {
+    //            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    //        }
 }
