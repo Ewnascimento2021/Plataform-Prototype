@@ -6,6 +6,11 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D rb;
+    public Transform firePoint;
+    private Animator animator;
+    private Vector2 facingRight;
+    private Vector2 facingLeft;
+    public LayerMask raycastLayerMask;
 
     [SerializeField]
     private int moveSpeed;
@@ -18,17 +23,24 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float reloadTimeAttack;
     [SerializeField]
+    private float reloadTimeAttack2;
+    [SerializeField]
+    private float reloadTimeRoll;
+    [SerializeField]
     private bool isGrounded;
     [SerializeField]
     private bool isJumping;
+    [SerializeField]
+    private bool isRolling;
 
-    private Animator animator;
-
-    private bool testAttack = false;
+    private bool isBullet;
+    private bool isPlatform;
+    private bool testDefend;
     private float direction;
-    private float elapsedTime;
-    private Vector2 facingRight;
-    private Vector2 facingLeft;
+    public bool platform;
+
+
+    RaycastHit2D hitInfo;
 
 
     void Start()
@@ -41,24 +53,27 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
+        DoubleJump();
+
+        //VariableJump();
+
+        Attack1();
+
+        Attack2();
+
+        Roll();
+
+        Defend();
+
         Run();
 
         JumpTest();
 
+        hitInfo = Physics2D.Raycast(firePoint.position, firePoint.up, 4f, raycastLayerMask);
 
-
-    }
-
-
-
-    private void Update()
-    {
-        VariableJump();
-
-        Attack();
-
+        isPlatform = hitInfo;
     }
 
     private void Jump()
@@ -67,7 +82,6 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
         }
     }
-
 
     private void DoubleJump()
     {
@@ -78,6 +92,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetButtonDown("Jump"))
             {
                 Jump();
+                animator.SetBool("Jump", true);
             }
         }
         else
@@ -86,10 +101,14 @@ public class PlayerController : MonoBehaviour
             {
                 doubleJump--;
                 Jump();
+                animator.SetBool("Jump", true);
+            }
+            if (isGrounded)
+            {
+                animator.SetBool("Jump", false);
             }
         }
     }
-
 
     private void VariableJump()
     {
@@ -125,13 +144,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     private void Run()
     {
-        if (testAttack == false)
+        if (testDefend == false)
         {
-
-
             direction = (Input.GetAxisRaw("Horizontal"));
 
             if (direction == 0)
@@ -157,43 +173,91 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-    private void Attack()
+    private void Attack1()
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            animator.SetBool("Attack", true);
-
-            testAttack = true;
+            animator.SetTrigger("Attack1");
         }
+    }
 
-        if (testAttack == true)
+    private void Attack2()
+    {
+        if (Input.GetButtonDown("Fire2"))
         {
-            elapsedTime += Time.deltaTime;
+            animator.SetTrigger("Attack2");
+        }
+    }
 
-            if (elapsedTime >= reloadTimeAttack)
+    private void Defend()
+    {
+        {
+            if (Input.GetButtonDown("Defend"))
             {
-                elapsedTime = 0f;
+                animator.SetBool("Defend", true);
 
-                animator.SetBool("Attack", false);
+                testDefend = true;
+            }
+            if (Input.GetButtonUp("Defend"))
+            {
+                animator.SetBool("Defend", false);
 
-                testAttack = false;
+                testDefend = false;
             }
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void Roll()
+
     {
-        if (collision.gameObject.tag == "Ground")
+        if (Input.GetButtonDown("Roll"))
+        {
+            animator.SetBool("Roll", true);
+        }
+        if (isPlatform == true)
+        {
+            animator.SetBool("Roll", true);
+            rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
+            //Debug.DrawLine(firePoint.position, hitInfo.point, Color.red);
+        }
+
+        else if ((Input.GetAxisRaw("Roll") == 0) && (isPlatform == false))
+        {
+            {
+                animator.SetBool("Roll", false);
+            }
+        }
+    }
+
+
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject)
         {
             isGrounded = true;
             animator.SetBool("Jump", false);
         }
-    }
+        if (other.CompareTag("Flecha"))
+        {
+            Destroy(other.gameObject);
+            animator.SetTrigger("Damage");
+            Debug.Log(isBullet);
+        }
+        if (other.CompareTag("Armadilha"))
+        {
+            animator.SetTrigger("Kill");
+        }
+        if (other.CompareTag("Bau"))
+        {
+            Destroy(other.gameObject);
+        }
 
-    private void OnTriggerExit2D(Collider2D collision)
+
+    }
+    private void OnTriggerExit2D(Collider2D other)
     {
-        if (collision.gameObject.tag == "Ground")
+        if (other.gameObject)
         {
             isGrounded = false;
         }

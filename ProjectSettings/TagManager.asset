@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Platform
+  - Enemy
+  - Flecha
+  - Armadilha
+  - Bau
   layers:
   - Default
   - TransparentFX
